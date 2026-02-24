@@ -10,7 +10,7 @@ Multi-agent pipeline that produces pixel-perfect clones of web applications. Eac
 ## Invocation
 
 ```
-/clone <url> --name <clone-name> [--stack auto|nextjs-tailwind|vite-css] [--tracking codeq|markdown] [--output ./src/app/clone]
+/clone <url> --name <clone-name> [--stack auto|nextjs-tailwind|vite-css] [--output ./src/app/clone]
 ```
 
 Or run the orchestrator directly:
@@ -42,7 +42,6 @@ The orchestrator creates this at pipeline start:
   "clone_name": "my-clone",
   "output_dir": "./src/app/clone",
   "tech_stack": "auto",
-  "tracking": "markdown",
   "viewports": ["1920x1080", "768x1024", "375x667"],
   "pages": ["auto"],
   "qa_cycles": 4,
@@ -51,7 +50,6 @@ The orchestrator creates this at pipeline start:
 ```
 
 - `tech_stack: "auto"` — Stage 4 detects from `package.json` and project structure
-- `tracking: "codeq"` — logs to Code Queue; `"markdown"` — logs to workspace only
 - `pages: ["auto"]` — discover all routes; or specify `["/", "/about", "/pricing"]`
 
 ## Workspace Structure
@@ -73,7 +71,7 @@ Reads screenshots + extraction output. Synthesizes `design-system.md` with exact
 Reads design spec + sitemap. Detects target project's tech stack. Plans component tree, routing, file structure, data model. See [references/04-architecture.md](references/04-architecture.md).
 
 ### Stage 5: Build Agent
-Implements the clone page-by-page using the architecture plan and design spec. Periodic visual checks via agent-browser. Runs build to verify compilation. May use multiple Ralph-loop iterations. See [references/05-build.md](references/05-build.md).
+Implements the clone page-by-page using the architecture plan and design spec. Periodic visual checks via agent-browser. Runs build to verify compilation. See [references/05-build.md](references/05-build.md).
 
 ### Stage 6: QA Agent (fresh eyes — never saw build)
 Screenshots clone at matching viewports. Grades EVERY element A/B/C/F. Checks cursors, hovers, animations, responsive, dark mode. Outputs structured `bugs.json`. See [references/06-qa.md](references/06-qa.md).
@@ -149,18 +147,9 @@ clone-workspace/{clone-name}/
 └── status.json               # {current_stage, completed_stages}
 ```
 
-## Tracking Modes
+## Progress Tracking
 
-**Code Queue mode** (`tracking: "codeq"`):
-- Creates `[CLONE] Clone {app_name}` parent issue at start
-- Each stage appends timestamped comment to the issue
-- QA bugs logged as sub-issues
-- Uses Code Queue skill API (see `.claude/skills/code-queue/SKILL.md`)
-
-**Markdown mode** (`tracking: "markdown"`):
-- All progress in `clone-workspace/{name}/progress.md`
-- Machine state in `status.json`
-- No external API calls — fully self-contained
+All progress is tracked in `clone-workspace/{name}/progress.md` (append-only log) and `status.json` (machine-readable state). Fully self-contained — no external API calls.
 
 ## Running the Orchestrator
 
@@ -171,7 +160,6 @@ clone-workspace/{clone-name}/
 # With options
 .claude/skills/clone-app/scripts/clone.sh "https://example.com" "my-clone" \
   --stack nextjs-tailwind \
-  --tracking codeq \
   --output ./src/app/my-clone \
   --timeout 8
 
