@@ -148,7 +148,10 @@ $(cat "$ref_file")"
 
   # Run agent with fresh context
   local result
-  result=$(claude -p "$prompt" --allowedTools "Bash,Read,Write,Edit,Glob,Grep" 2>&1) || true
+  result=$(claude -p "$prompt" \
+    --allowedTools "Bash,Read,Write,Edit,Glob,Grep" \
+    --disallowedTools "mcp__playwright__browser_navigate,mcp__playwright__browser_snapshot,mcp__playwright__browser_click,mcp__playwright__browser_type,mcp__playwright__browser_take_screenshot,mcp__playwright__browser_run_code,mcp__playwright__browser_evaluate,mcp__playwright__browser_close,mcp__playwright__browser_resize,mcp__playwright__browser_console_messages,mcp__playwright__browser_handle_dialog,mcp__playwright__browser_file_upload,mcp__playwright__browser_fill_form,mcp__playwright__browser_install,mcp__playwright__browser_press_key,mcp__playwright__browser_navigate_back,mcp__playwright__browser_network_requests,mcp__playwright__browser_select_option,mcp__playwright__browser_tabs,mcp__playwright__browser_wait_for,mcp__playwright__browser_hover,mcp__playwright__browser_drag" \
+    2>&1) || true
 
   # Check completion signal
   if echo "$result" | grep -q '<promise>BLOCKED'; then
