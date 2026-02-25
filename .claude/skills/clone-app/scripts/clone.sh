@@ -99,6 +99,22 @@ get_stage() {
   python3 -c "import json; print(json.load(open('$WORKSPACE/status.json'))['current_stage'])"
 }
 
+# --- Reference file map: stage number → reference file ---
+get_reference_file() {
+  local stage="$1"
+  case "$stage" in
+    1)     echo "$SKILL_DIR/references/01-recon.md" ;;
+    2)     echo "$SKILL_DIR/references/02-extraction.md" ;;
+    3)     echo "$SKILL_DIR/references/03-design-spec.md" ;;
+    4)     echo "$SKILL_DIR/references/04-architecture.md" ;;
+    5)     echo "$SKILL_DIR/references/05-build.md" ;;
+    6*)    echo "$SKILL_DIR/references/06-qa.md" ;;
+    7*)    echo "" ;;
+    9)     echo "$SKILL_DIR/references/07-polish.md" ;;
+    *)     echo "" ;;
+  esac
+}
+
 # --- Helper: run a stage agent ---
 run_stage() {
   local stage_num="$1"
@@ -118,6 +134,17 @@ run_stage() {
     sed "s|{SKILL_DIR}|$SKILL_DIR|g" | \
     sed "s|{TIMESTAMP}|$(date -u +"%Y-%m-%dT%H:%M:%SZ")|g" | \
     sed "s|{QA_CYCLES}|$QA_CYCLES|g")
+
+  # Inject reference file directly into the prompt
+  local ref_file
+  ref_file=$(get_reference_file "$stage_num")
+  if [[ -n "$ref_file" && -f "$ref_file" ]]; then
+    prompt="$prompt
+
+=== DETAILED INSTRUCTIONS (follow every step) ===
+
+$(cat "$ref_file")"
+  fi
 
   # Run agent with fresh context
   local result
