@@ -8,6 +8,18 @@ All output goes to `clone-workspace/{name}/01-recon/`.
 
 ---
 
+## ACCESS RULE — READ THIS FIRST
+
+After navigating to the target URL, check what loaded:
+
+1. If you see a **login page**, **auth wall**, **paywall**, or **403/401 error** — STOP IMMEDIATELY
+2. Do NOT "use your knowledge" of the app. Do NOT guess. Do NOT generate content from memory.
+3. Output: `<promise>BLOCKED: Cannot access target app — requires authentication. User must provide a logged-in session or accessible URL.</promise>`
+
+If you can't see it, you can't screenshot it, and you can't clone it. Never fabricate UI from memory.
+
+---
+
 ## Viewport Matrix
 
 Capture every page at all three viewports:
